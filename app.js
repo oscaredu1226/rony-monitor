@@ -45,28 +45,28 @@ const recentOperations = [
     residue: 'Lata de aluminio',
     category: 'Aluminio',
     result: 'Clasificación exitosa',
-    duration: '4.2 s'
+    duration: '15.8 s'
   },
   {
     time: '10:23:48',
     residue: 'Tapa plástica',
     category: 'Plástico',
     result: 'Clasificación exitosa',
-    duration: '4.5 s'
+    duration: '16.2 s'
   },
   {
     time: '10:23:21',
     residue: 'Caja de cartón',
     category: 'Cartón',
     result: 'Clasificación exitosa',
-    duration: '3.9 s'
+    duration: '15.4 s'
   },
   {
     time: '10:22:56',
     residue: 'Lata de aluminio',
     category: 'Aluminio',
     result: 'Clasificación exitosa',
-    duration: '4.1 s'
+    duration: '16.0 s'
   }
 ];
 
@@ -78,7 +78,7 @@ const historyRows = [
     category: 'Aluminio',
     confidence: '94%',
     result: 'Correcta',
-    duration: '4.2 s'
+    duration: '15.8 s'
   },
   {
     date: '21/04/2025 10:23:48',
@@ -86,7 +86,7 @@ const historyRows = [
     category: 'Plástico',
     confidence: '87%',
     result: 'Correcta',
-    duration: '4.5 s'
+    duration: '16.2 s'
   },
   {
     date: '21/04/2025 10:23:21',
@@ -94,7 +94,7 @@ const historyRows = [
     category: 'Cartón',
     confidence: '91%',
     result: 'Correcta',
-    duration: '3.9 s'
+    duration: '15.4 s'
   },
   {
     date: '21/04/2025 10:22:56',
@@ -102,7 +102,7 @@ const historyRows = [
     category: 'Plástico',
     confidence: '76%',
     result: 'Fallida',
-    duration: '5.8 s'
+    duration: '17.1 s'
   },
   {
     date: '21/04/2025 10:22:14',
@@ -110,7 +110,7 @@ const historyRows = [
     category: 'Cartón',
     confidence: '82%',
     result: 'Correcta',
-    duration: '4.0 s'
+    duration: '15.7 s'
   },
   {
     date: '21/04/2025 10:21:33',
@@ -118,7 +118,7 @@ const historyRows = [
     category: 'Aluminio',
     confidence: '89%',
     result: 'Correcta',
-    duration: '4.1 s'
+    duration: '16.0 s'
   }
 ];
 
@@ -234,16 +234,50 @@ function renderHistory() {
    SIMULACIÓN EN TIEMPO REAL
    ========================================================= */
 
+const detectedObjects = [
+  {
+    residue: 'Pedazo de cartón',
+    shortName: 'Cartón',
+    category: 'Cartón',
+    confidence: 86,
+    pixel: { x: 174, y: 254 },
+    offset: { x: 55.5, y: -36.0 },
+    target: { x: 55.5, y: -199.0 },
+    destination: 'Contenedor de cartón'
+  },
+  {
+    residue: 'Tapa plástica morada',
+    shortName: 'Tapa',
+    category: 'Plástico',
+    confidence: 90,
+    pixel: { x: 326, y: 367 },
+    offset: { x: -12.2, y: 4.8 },
+    target: { x: -12.2, y: -158.1 },
+    destination: 'Contenedor de plástico'
+  },
+  {
+    residue: 'Tapa plástica transparente',
+    shortName: 'Tapa',
+    category: 'Plástico',
+    confidence: 88,
+    pixel: { x: 452, y: 307 },
+    offset: { x: -66.2, y: -23.1 },
+    target: { x: -66.2, y: -186.0 },
+    destination: 'Contenedor de plástico'
+  }
+];
+
 const stages = [
-  { state: 'Detectando', duration: 650 },
-  { state: 'Localizando', duration: 600 },
-  { state: 'Planificando', duration: 700 },
-  { state: 'Sujetando', duration: 700 },
-  { state: 'Trasladando', duration: 1100 },
-  { state: 'Clasificando', duration: 650 }
+  { state: 'Detectando', duration: 1800 },
+  { state: 'Localizando', duration: 1400 },
+  { state: 'Planificando', duration: 2200 },
+  { state: 'Sujetando', duration: 3000 },
+  { state: 'Trasladando', duration: 5500 },
+  { state: 'Clasificando', duration: 2000 }
 ];
 
 const cycleDuration = stages.reduce((total, stage) => total + stage.duration, 0);
+const interCycleDelay = 2600;
 const processSteps = document.querySelectorAll('[data-process-step]');
 const timelineSteps = document.querySelectorAll('[data-timeline-step]');
 const simulationToggle = document.getElementById('simulationToggle');
@@ -251,15 +285,20 @@ const simulationToggle = document.getElementById('simulationToggle');
 let cycleStartedAt = Date.now();
 let pausedAt = 0;
 let simulationPaused = false;
+let cycleCompleted = false;
+let lastCycleSuccessful = true;
 let lastStage = -1;
 let lastCoordinateUpdate = 0;
-let confidence = 94;
-let position = { x: 215, y: 132, z: 48 };
+let activeObjectIndex = -1;
+let activeObject = detectedObjects[0];
+let confidence = activeObject.confidence;
+let basePosition = { ...activeObject.offset };
+let position = { ...activeObject.offset };
 let processedToday = 48;
 let totalOperations = 128;
 let successfulOperations = 119;
 let failedOperations = 9;
-let averageDuration = 4.3;
+let averageDuration = 15.9;
 
 const getById = id => document.getElementById(id);
 
@@ -310,33 +349,38 @@ function seedOperationTimes() {
 
 function updateDetectionData(refresh = false) {
   const confidenceText = `${confidence}%`;
-  const positionText = `X: ${position.x} mm | Y: ${position.y} mm | Z: ${position.z} mm`;
-  const detectionText = `Lata · Aluminio · ${confidenceText}`;
+  const positionText = `X: ${position.x.toFixed(1)} mm | Y: ${position.y.toFixed(1)} mm`;
+  const targetText = `X: ${activeObject.target.x.toFixed(1)} mm | Y: ${activeObject.target.y.toFixed(1)} mm`;
+  const pixelText = `px (${activeObject.pixel.x},${activeObject.pixel.y})`;
+  const activeText = `Analizando: ${activeObject.shortName}`;
 
-  setText('dashboardResidue', 'Lata', refresh);
-  setText('dashboardCategory', 'Aluminio', refresh);
+  setText('dashboardResidue', activeObject.shortName, refresh);
+  setText('dashboardCategory', activeObject.category, refresh);
   setText('dashboardConfidence', confidenceText, refresh);
-  setText('previewDetectionLabel', detectionText);
-  setText('liveDetectionLabel', detectionText);
-  setText('operationResidue', 'Lata de aluminio', refresh);
+  setText('previewActiveObject', activeText);
+  setText('feedActiveObject', activeText);
+  setText('operationResidue', activeObject.residue, refresh);
   setText('operationConfidence', confidenceText, refresh);
   setText('operationPosition', positionText, refresh);
-  setText('operationDestination', 'Contenedor de aluminio');
-  setText('detectedResidue', 'Lata de aluminio', refresh);
-  setText('detectedCategory', 'Aluminio');
+  setText('operationDestination', activeObject.destination);
+  setText('detectedResidue', activeObject.residue, refresh);
+  setText('detectedCategory', activeObject.category);
   setText('detectedConfidence', confidenceText, refresh);
-  setText('detectedPosition', positionText, refresh);
-  setText('targetDestination', 'Contenedor de aluminio');
-  setText('targetPosition', positionText, refresh);
+  setText('detectedPosition', pixelText, refresh);
+  setText('targetDestination', activeObject.destination);
+  setText('targetPosition', targetText, refresh);
+
+  const categoryTag = getById('detectedCategory');
+  categoryTag.className = `tag ${tagClass(activeObject.category)}`;
 }
 
 function beginCycle() {
-  confidence = randomInt(91, 98);
-  position = {
-    x: randomInt(208, 221),
-    y: randomInt(126, 137),
-    z: randomInt(44, 51)
-  };
+  activeObjectIndex = (activeObjectIndex + 1) % detectedObjects.length;
+  activeObject = detectedObjects[activeObjectIndex];
+  confidence = activeObject.confidence;
+  basePosition = { ...activeObject.offset };
+  position = { ...basePosition };
+  cycleCompleted = false;
   lastStage = -1;
   updateDetectionData(true);
 }
@@ -431,8 +475,8 @@ function completeCycle() {
 
   recentOperations.unshift({
     time: formatClock(completedAt),
-    residue: 'Lata de aluminio',
-    category: 'Aluminio',
+    residue: activeObject.residue,
+    category: activeObject.category,
     result,
     duration
   });
@@ -440,8 +484,8 @@ function completeCycle() {
 
   historyRows.unshift({
     date: formatDateTime(completedAt),
-    residue: 'Lata de aluminio',
-    category: 'Aluminio',
+    residue: activeObject.residue,
+    category: activeObject.category,
     confidence: `${confidence}%`,
     result: successful ? 'Correcta' : 'Fallida',
     duration
@@ -454,10 +498,26 @@ function completeCycle() {
   successfulOperations += successful ? 1 : 0;
   failedOperations += successful ? 0 : 1;
   averageDuration = ((averageDuration * previousTotal) + (cycleDuration / 1000)) / totalOperations;
+  lastCycleSuccessful = successful;
 
   renderRecent();
   renderHistory();
   updateSummaryCards();
+}
+
+function showCompletedCycle() {
+  updateStepStates(stages.length, cycleDuration);
+  setText('dashboardMonitorState', 'Ciclo completado');
+  setText('monitorState', lastCycleSuccessful ? 'Clasificación completada' : 'Revisión requerida');
+  setText('currentStage', `${stages.length} de ${stages.length}`);
+  setText('gripperState', 'Abierta');
+  setText(
+    'gripperDetail',
+    lastCycleSuccessful ? 'Objeto depositado. Preparando el siguiente ciclo.' : 'Verificación manual solicitada.'
+  );
+  setText('dashboardCycleTime', `${(cycleDuration / 1000).toFixed(1)} s`);
+  setText('elapsedCycle', `${(cycleDuration / 1000).toFixed(1)} s`);
+  getById('cycleProgress').style.width = '100%';
 }
 
 function updateSimulation() {
@@ -468,11 +528,20 @@ function updateSimulation() {
   const now = Date.now();
   let elapsed = now - cycleStartedAt;
 
-  if (elapsed >= cycleDuration) {
-    completeCycle();
+  if (elapsed >= cycleDuration + interCycleDelay) {
     cycleStartedAt = now;
     elapsed = 0;
     beginCycle();
+  }
+
+  if (elapsed >= cycleDuration) {
+    if (!cycleCompleted) {
+      completeCycle();
+      cycleCompleted = true;
+    }
+
+    showCompletedCycle();
+    return;
   }
 
   const stageIndex = stageAt(elapsed);
@@ -484,10 +553,11 @@ function updateSimulation() {
     lastStage = stageIndex;
   }
 
-  if (now - lastCoordinateUpdate > 450) {
-    position.x += randomInt(-1, 1);
-    position.y += randomInt(-1, 1);
-    position.z += randomInt(-1, 1);
+  if (now - lastCoordinateUpdate > 1200) {
+    position = {
+      x: basePosition.x + (Math.random() - 0.5),
+      y: basePosition.y + (Math.random() - 0.5)
+    };
     updateDetectionData();
     lastCoordinateUpdate = now;
   }

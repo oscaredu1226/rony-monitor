@@ -82,11 +82,11 @@
         </article>
         <article class="stat-card">
           <div class="stat-icon"><svg><use href="#i-db"/></svg></div>
-          <span>Residuo actual</span><strong id="dashboardResidue">Lata</strong><small>● Detectado por visión</small>
+          <span>Residuo actual</span><strong id="dashboardResidue">Cartón</strong><small>● Detectado por visión</small>
         </article>
         <article class="stat-card">
           <div class="stat-icon"><svg><use href="#i-recycle"/></svg></div>
-          <span>Categoría detectada</span><strong class="blue-text" id="dashboardCategory">Aluminio</strong><small>● Confianza: <span id="dashboardConfidence">94%</span></small>
+          <span>Categoría detectada</span><strong class="blue-text" id="dashboardCategory">Cartón</strong><small>● Confianza: <span id="dashboardConfidence">86%</span></small>
         </article>
         <article class="stat-card">
           <div class="stat-icon"><svg><use href="#i-clock"/></svg></div>
@@ -117,19 +117,19 @@
           <div class="panel-heading"><div><h2>Operación actual</h2><p>Información del residuo en proceso de clasificación.</p></div></div>
           <div class="operation-content">
             <div class="detection-preview simulated-feed">
-              <img src="assets/detection-feed.png" alt="Simulación de detección de una lata" />
+              <img src="assets/detection-mock-es.png" alt="Simulación de detección de cartón y objetos plásticos" />
               <div class="feed-shade"></div>
               <div class="scan-line"></div>
-              <div class="bin-label">ALUMINIO</div>
-              <div class="detection-box preview-box"><span class="detection-label" id="previewDetectionLabel">Lata · Aluminio · 94%</span></div>
+              <div class="plastic-label-fix">plástico 0.88</div>
+              <div class="active-object-badge" id="previewActiveObject">Analizando: Cartón</div>
               <div class="feed-corner feed-corner-left"><span class="live-dot"></span> SIMULACIÓN EN VIVO</div>
               <div class="feed-corner feed-corner-right" id="previewFeedTime">--:--:--</div>
             </div>
             <dl class="details-list">
-              <div><dt>Residuo detectado</dt><dd id="operationResidue">Lata de aluminio</dd></div>
-              <div><dt>Confianza YOLO</dt><dd id="operationConfidence">94%</dd></div>
-              <div><dt>Posición estimada</dt><dd id="operationPosition">X: 215 mm | Y: 132 mm | Z: 48 mm</dd></div>
-              <div><dt>Destino</dt><dd id="operationDestination">Contenedor de aluminio</dd></div>
+              <div><dt>Residuo detectado</dt><dd id="operationResidue">Pedazo de cartón</dd></div>
+              <div><dt>Confianza YOLO</dt><dd id="operationConfidence">86%</dd></div>
+              <div><dt>Desplazamiento estimado</dt><dd id="operationPosition">X: 55.5 mm | Y: -36.0 mm</dd></div>
+              <div><dt>Destino</dt><dd id="operationDestination">Contenedor de cartón</dd></div>
               <div><dt>Modo experimental</dt><dd>Con optimización</dd></div>
             </dl>
           </div>
@@ -158,22 +158,22 @@
             <div><h2>Vista de detección</h2><p>Transmisión simulada en tiempo real de la cámara.</p></div>
             <button class="simulation-toggle" id="simulationToggle" type="button" aria-pressed="false"><span class="pause-symbol">Ⅱ</span><span class="toggle-label">Pausar</span></button>
           </div>
-          <div class="camera-feed simulated-feed" role="img" aria-label="Transmisión simulada de una lata en la banda transportadora">
-            <img src="assets/detection-feed.png" alt="Vista simulada de detección" />
+          <div class="camera-feed simulated-feed" role="img" aria-label="Transmisión simulada con detección de cartón y objetos plásticos">
+            <img src="assets/detection-mock-es.png" alt="Vista simulada de detección múltiple" />
             <div class="feed-shade"></div>
             <div class="camera-grid"></div>
             <div class="scan-line"></div>
-            <div class="bin-label">ALUMINIO</div>
-            <div class="detection-box live-box" id="liveDetectionBox"><span id="liveDetectionLabel">Lata · Aluminio · 94%</span></div>
+            <div class="plastic-label-fix">plástico 0.88</div>
+            <div class="active-object-badge" id="feedActiveObject">Analizando: Cartón</div>
             <div class="feed-corner feed-corner-left"><span class="live-dot"></span> SIMULACIÓN EN VIVO</div>
             <div class="feed-corner feed-corner-right" id="feedTime">--:--:--</div>
             <div class="feed-footer"><span>CÁMARA 01 · CLASIFICACIÓN</span><span id="feedFps">29.8 FPS</span></div>
             <div class="cycle-progress" aria-hidden="true"><span id="cycleProgress"></span></div>
           </div>
           <div class="detected-info">
-            <div class="thumb"><img src="assets/detection-feed.png" alt="Lata detectada" /></div>
-            <div><small>Objeto detectado</small><b id="detectedResidue">Lata de aluminio</b><small>Categoría</small><span class="tag aluminio" id="detectedCategory">Aluminio</span></div>
-            <div><small>Confianza</small><b id="detectedConfidence">94%</b><small>Posición estimada</small><b class="small-value" id="detectedPosition">X: 215 mm | Y: 132 mm | Z: 48 mm</b></div>
+            <div class="thumb"><img src="assets/detection-mock-es.png" alt="Objetos detectados" /></div>
+            <div><small>Objeto seleccionado</small><b id="detectedResidue">Pedazo de cartón</b><small>Categoría</small><span class="tag carton" id="detectedCategory">Cartón</span></div>
+            <div><small>Confianza</small><b id="detectedConfidence">86%</b><small>Coordenadas en imagen</small><b class="small-value" id="detectedPosition">px (174,254)</b></div>
           </div>
         </article>
 
@@ -182,10 +182,10 @@
           <dl class="state-summary">
             <div><dt>Estado actual</dt><dd class="blue-text" id="monitorState">Detectando</dd></div>
             <div><dt>Etapa actual</dt><dd id="currentStage">1 de 6</dd></div>
-            <div><dt>Destino</dt><dd class="blue-text" id="targetDestination">Contenedor de aluminio</dd></div>
+            <div><dt>Destino</dt><dd class="blue-text" id="targetDestination">Contenedor de cartón</dd></div>
             <div><dt>Modo experimental</dt><dd class="blue-text">Con optimización</dd></div>
             <div><dt>Tiempo transcurrido del ciclo</dt><dd id="elapsedCycle">0.0 s</dd></div>
-            <div><dt>Posición objetivo</dt><dd id="targetPosition">X: 215 mm | Y: 132 mm | Z: 48 mm</dd></div>
+            <div><dt>Posición objetivo</dt><dd id="targetPosition">X: 55.5 mm | Y: -199.0 mm</dd></div>
           </dl>
 
           <div class="timeline">
@@ -215,7 +215,7 @@
         <article class="summary-card"><div class="summary-icon"><svg><use href="#i-doc"/></svg></div><div><span>Total de operaciones</span><strong id="totalOperations">128</strong><small>Registros en el período</small></div></article>
         <article class="summary-card success-bg"><div class="summary-icon success"><svg><use href="#i-check"/></svg></div><div><span>Clasificaciones correctas</span><strong class="success-text" id="successfulOperations">119</strong><small id="successRate">92.9% del total</small></div></article>
         <article class="summary-card danger-bg"><div class="summary-icon danger">×</div><div><span>Clasificaciones fallidas</span><strong class="danger-text" id="failedOperations">9</strong><small id="failureRate">7.1% del total</small></div></article>
-        <article class="summary-card"><div class="summary-icon"><svg><use href="#i-clock"/></svg></div><div><span>Tiempo promedio</span><strong id="averageTime">4.3 s</strong><small>Por operación</small></div></article>
+        <article class="summary-card"><div class="summary-icon"><svg><use href="#i-clock"/></svg></div><div><span>Tiempo promedio</span><strong id="averageTime">15.9 s</strong><small>Por operación</small></div></article>
       </div>
 
       <article class="panel table-panel classifications-table">
