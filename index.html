@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitor de clasificación</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- SVG icon sprite: no external libraries needed -->
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5v8a1.5 1.5 0 0 1-1.5 1.5h-5v-6h-5v6h-5A1.5 1.5 0 0 1 3 19.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 7h3l1.3-2h7.4L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H3v-4h.1a1.7 1.7 0 0 0 1.6-1A1.7 1.7 0 0 0 4.3 7l-.1-.1L7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.1v4H21a1.7 1.7 0 0 0-1.6 1Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-robot" viewBox="0 0 24 24"><path d="M5 19h5v-3H7l3-4 3 2 2-4 3 1 1-3-4-2-2 4-3-2-5 7Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3 21h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="18.5" cy="6.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-recycle" viewBox="0 0 24 24"><path d="m9 4 2-2 2 3-2 3M6 9 3 10l1 4 3-1M15 18l1 4 4-1-1-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 5h4a4 4 0 0 1 3.5 2M5 12l2 4a4 4 0 0 0 3.5 2H14M18 16l2-4a4 4 0 0 0-.5-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M12 21s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-gripper" viewBox="0 0 24 24"><path d="M8 3v6l-3 3v7M16 3v6l3 3v7M8 9h8M5 19l3-4M19 19l-3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M5 19V9M12 19V4M19 19v-7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 2v5h5M9 12h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon"><svg><use href="#i-robot"/></svg></div>
+      <div>
+        <strong>Monitor</strong>
+        <span>Clasificación de residuos<br />con visión artificial</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-link active" data-view="dashboard">
+        <svg><use href="#i-home"/></svg><span>Panel principal</span>
+      </button>
+      <button class="nav-link" data-view="monitoring">
+        <svg><use href="#i-camera"/></svg><span>Monitoreo</span>
+      </button>
+      <button class="nav-link" data-view="classifications">
+        <svg><use href="#i-db"/></svg><span>Clasificaciones</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      Sistema experimental de clasificación de residuos sólidos con brazo robótico
+      <small>v1.0.0</small>
+    </div>
+  </aside>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div></div>
+      <div class="topbar-right">
+        <span class="online"><i></i>Sistema en línea</span>
+        <span class="divider"></span>
+        <span id="currentDateTime">--</span>
+        <span class="divider"></span>
+        <span class="avatar">US</span>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="dashboard">
+      <div class="view-title">
+        <h1>Panel principal</h1>
+        <p>Resumen general del sistema de clasificación automatizada.</p>
+      </div>
+
+      <div class="stats-grid stats-grid-6">
+        <article class="stat-card">
+          <div class="stat-icon success"><svg><use href="#i-settings"/></svg></div>
+          <span>Estado del sistema</span><strong class="success-text">Activo</strong><small>● Funcionamiento normal</small>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon"><svg><use href="#i-robot"/></svg></div>
+          <span>Estado del monitor</span><strong class="blue-text" id="dashboardMonitorState">Clasificando</strong><small>● Ejecutando secuencia</small>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon"><svg><use href="#i-db"/></svg></div>
+          <span>Residuo actual</span><strong id="dashboardResidue">Lata</strong><small>● Detectado por visión</small>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon"><svg><use href="#i-recycle"/></svg></div>
+          <span>Categoría detectada</span><strong class="blue-text" id="dashboardCategory">Aluminio</strong><small>● Confianza: <span id="dashboardConfidence">94%</span></small>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon"><svg><use href="#i-clock"/></svg></div>
+          <span>Tiempo de ciclo actual</span><strong id="dashboardCycleTime">0.0 s</strong><small>● Con optimización</small>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon"><svg><use href="#i-bars"/></svg></div>
+          <span>Objetos procesados hoy</span><strong id="processedToday">48</strong><small class="success-text">↗ Datos de la simulación</small>
+        </article>
+      </div>
+
+      <article class="panel process-panel">
+        <div class="panel-heading">
+          <div><h2>Flujo del proceso</h2><p>Estado actual de la secuencia de clasificación de residuos.</p></div>
+        </div>
+        <div class="process-flow">
+          <div class="process-step current" data-process-step="0"><span><svg><use href="#i-camera"/></svg></span><b>Detección</b><small>En proceso</small></div>
+          <div class="process-step pending" data-process-step="1"><span><svg><use href="#i-map"/></svg></span><b>Localización</b><small>Pendiente</small></div>
+          <div class="process-step pending" data-process-step="2"><span><svg><use href="#i-settings"/></svg></span><b>Planificación</b><small>Pendiente</small></div>
+          <div class="process-step pending" data-process-step="3"><span><svg><use href="#i-gripper"/></svg></span><b>Agarre</b><small>Pendiente</small></div>
+          <div class="process-step pending" data-process-step="4"><span><svg><use href="#i-arrow"/></svg></span><b>Traslado</b><small>Pendiente</small></div>
+          <div class="process-step pending" data-process-step="5"><span><svg><use href="#i-recycle"/></svg></span><b>Clasificación</b><small>Pendiente</small></div>
+        </div>
+      </article>
+
+      <div class="dashboard-row">
+        <article class="panel current-operation">
+          <div class="panel-heading"><div><h2>Operación actual</h2><p>Información del residuo en proceso de clasificación.</p></div></div>
+          <div class="operation-content">
+            <div class="detection-preview simulated-feed">
+              <img src="assets/detection-feed.png" alt="Simulación de detección de una lata" />
+              <div class="feed-shade"></div>
+              <div class="scan-line"></div>
+              <div class="bin-label">ALUMINIO</div>
+              <div class="detection-box preview-box"><span class="detection-label" id="previewDetectionLabel">Lata · Aluminio · 94%</span></div>
+              <div class="feed-corner feed-corner-left"><span class="live-dot"></span> SIMULACIÓN EN VIVO</div>
+              <div class="feed-corner feed-corner-right" id="previewFeedTime">--:--:--</div>
+            </div>
+            <dl class="details-list">
+              <div><dt>Residuo detectado</dt><dd id="operationResidue">Lata de aluminio</dd></div>
+              <div><dt>Confianza YOLO</dt><dd id="operationConfidence">94%</dd></div>
+              <div><dt>Posición estimada</dt><dd id="operationPosition">X: 215 mm | Y: 132 mm | Z: 48 mm</dd></div>
+              <div><dt>Destino</dt><dd id="operationDestination">Contenedor de aluminio</dd></div>
+              <div><dt>Modo experimental</dt><dd>Con optimización</dd></div>
+            </dl>
+          </div>
+        </article>
+
+        <article class="panel recent-operations-panel">
+          <div class="panel-heading"><div><h2>Últimas operaciones</h2><p>Registro de las operaciones más recientes del sistema.</p></div></div>
+          <div class="table-wrap compact-table-wrap">
+            <table class="compact-table">
+              <thead><tr><th>Hora</th><th>Residuo</th><th>Resultado</th><th>Tiempo</th></tr></thead>
+              <tbody id="recentOperations"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- MONITOREO -->
+    <section class="view" id="monitoring">
+      <div class="view-title"><h1>Monitoreo</h1><p>Seguimiento del proceso de clasificación en tiempo real.</p></div>
+
+      <div class="monitor-grid">
+        <article class="panel camera-panel">
+          <div class="panel-heading icon-heading camera-heading">
+            <div class="square-icon"><svg><use href="#i-camera"/></svg></div>
+            <div><h2>Vista de detección</h2><p>Transmisión simulada en tiempo real de la cámara.</p></div>
+            <button class="simulation-toggle" id="simulationToggle" type="button" aria-pressed="false"><span class="pause-symbol">Ⅱ</span><span class="toggle-label">Pausar</span></button>
+          </div>
+          <div class="camera-feed simulated-feed" role="img" aria-label="Transmisión simulada de una lata en la banda transportadora">
+            <img src="assets/detection-feed.png" alt="Vista simulada de detección" />
+            <div class="feed-shade"></div>
+            <div class="camera-grid"></div>
+            <div class="scan-line"></div>
+            <div class="bin-label">ALUMINIO</div>
+            <div class="detection-box live-box" id="liveDetectionBox"><span id="liveDetectionLabel">Lata · Aluminio · 94%</span></div>
+            <div class="feed-corner feed-corner-left"><span class="live-dot"></span> SIMULACIÓN EN VIVO</div>
+            <div class="feed-corner feed-corner-right" id="feedTime">--:--:--</div>
+            <div class="feed-footer"><span>CÁMARA 01 · CLASIFICACIÓN</span><span id="feedFps">29.8 FPS</span></div>
+            <div class="cycle-progress" aria-hidden="true"><span id="cycleProgress"></span></div>
+          </div>
+          <div class="detected-info">
+            <div class="thumb"><img src="assets/detection-feed.png" alt="Lata detectada" /></div>
+            <div><small>Objeto detectado</small><b id="detectedResidue">Lata de aluminio</b><small>Categoría</small><span class="tag aluminio" id="detectedCategory">Aluminio</span></div>
+            <div><small>Confianza</small><b id="detectedConfidence">94%</b><small>Posición estimada</small><b class="small-value" id="detectedPosition">X: 215 mm | Y: 132 mm | Z: 48 mm</b></div>
+          </div>
+        </article>
+
+        <article class="panel monitor-state">
+          <div class="panel-heading icon-heading"><div class="square-icon"><svg><use href="#i-settings"/></svg></div><div><h2>Estado del monitor</h2><p>Información del estado actual del proceso.</p></div></div>
+          <dl class="state-summary">
+            <div><dt>Estado actual</dt><dd class="blue-text" id="monitorState">Detectando</dd></div>
+            <div><dt>Etapa actual</dt><dd id="currentStage">1 de 6</dd></div>
+            <div><dt>Destino</dt><dd class="blue-text" id="targetDestination">Contenedor de aluminio</dd></div>
+            <div><dt>Modo experimental</dt><dd class="blue-text">Con optimización</dd></div>
+            <div><dt>Tiempo transcurrido del ciclo</dt><dd id="elapsedCycle">0.0 s</dd></div>
+            <div><dt>Posición objetivo</dt><dd id="targetPosition">X: 215 mm | Y: 132 mm | Z: 48 mm</dd></div>
+          </dl>
+
+          <div class="timeline">
+            <div class="timeline-item current" data-timeline-step="0"><span></span><div><b>Detección</b><small>Analizando la imagen de la cámara.</small></div><em>0.0 s</em></div>
+            <div class="timeline-item pending" data-timeline-step="1"><span></span><div><b>Localización</b><small>Estimando la posición del objeto.</small></div><em>—</em></div>
+            <div class="timeline-item pending" data-timeline-step="2"><span></span><div><b>Planificación</b><small>Generando la trayectoria.</small></div><em>—</em></div>
+            <div class="timeline-item pending" data-timeline-step="3"><span></span><div><b>Agarre</b><small>Preparando la pinza.</small></div><em>—</em></div>
+            <div class="timeline-item pending" data-timeline-step="4"><span></span><div><b>Traslado</b><small>Moviendo hacia el contenedor.</small></div><em>—</em></div>
+            <div class="timeline-item pending" data-timeline-step="5"><span></span><div><b>Clasificación</b><small>Confirmando el depósito.</small></div><em>—</em></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="status-cards">
+        <article class="status-card"><div class="status-icon success"><svg><use href="#i-camera"/></svg></div><div><span>Cámara</span><strong class="success-text">Conectada</strong><small>Transmisión de video activa.</small></div></article>
+        <article class="status-card"><div class="status-icon success"><svg><use href="#i-cpu"/></svg></div><div><span>Modelo YOLO</span><strong class="success-text">Activo</strong><small>Ejecutando inferencia en tiempo real.</small></div></article>
+        <article class="status-card"><div class="status-icon"><svg><use href="#i-gripper"/></svg></div><div><span>Pinza</span><strong class="blue-text" id="gripperState">Abierta</strong><small id="gripperDetail">En espera del objeto.</small></div></article>
+        <article class="status-card"><div class="status-icon"><svg><use href="#i-clock"/></svg></div><div><span>Última actualización</span><strong id="lastUpdated">--</strong><small>Datos en tiempo real del sistema.</small></div></article>
+      </div>
+    </section>
+
+    <!-- CLASIFICACIONES -->
+    <section class="view" id="classifications">
+      <div class="view-title"><h1>Clasificaciones</h1><p>Historial de operaciones y resultados de clasificación.</p></div>
+
+      <div class="stats-grid stats-grid-4">
+        <article class="summary-card"><div class="summary-icon"><svg><use href="#i-doc"/></svg></div><div><span>Total de operaciones</span><strong id="totalOperations">128</strong><small>Registros en el período</small></div></article>
+        <article class="summary-card success-bg"><div class="summary-icon success"><svg><use href="#i-check"/></svg></div><div><span>Clasificaciones correctas</span><strong class="success-text" id="successfulOperations">119</strong><small id="successRate">92.9% del total</small></div></article>
+        <article class="summary-card danger-bg"><div class="summary-icon danger">×</div><div><span>Clasificaciones fallidas</span><strong class="danger-text" id="failedOperations">9</strong><small id="failureRate">7.1% del total</small></div></article>
+        <article class="summary-card"><div class="summary-icon"><svg><use href="#i-clock"/></svg></div><div><span>Tiempo promedio</span><strong id="averageTime">4.3 s</strong><small>Por operación</small></div></article>
+      </div>
+
+      <article class="panel table-panel classifications-table">
+        <div class="panel-heading icon-heading"><div class="square-icon"><svg><use href="#i-doc"/></svg></div><div><h2>Historial de clasificaciones</h2><p>Últimas operaciones de clasificación realizadas.</p></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha/Hora</th><th>Residuo</th><th>Categoría</th><th>Confianza</th><th>Resultado</th><th>Tiempo</th></tr></thead>
+            <tbody id="classificationHistory"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel system-panel">
+        <div class="panel-heading icon-heading"><div class="square-icon"><svg><use href="#i-settings"/></svg></div><div><h2>Estado del sistema</h2><p>Estado actual de los principales componentes del sistema.</p></div></div>
+        <div class="system-grid">
+          <div class="system-item"><svg><use href="#i-camera"/></svg><div><b>Cámara</b><span><i></i>Conectada</span></div></div>
+          <div class="system-item"><svg><use href="#i-cpu"/></svg><div><b>YOLO</b><span><i></i>Activo</span></div></div>
+          <div class="system-item"><svg><use href="#i-robot"/></svg><div><b>Monitor</b><span><i></i>Operativo</span></div></div>
+          <div class="system-item"><svg><use href="#i-gripper"/></svg><div><b>Pinza</b><span><i></i>Disponible</span></div></div>
+          <div class="system-item"><svg><use href="#i-settings"/></svg><div><b>Planificación</b><span><i></i>Operativa</span></div></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
